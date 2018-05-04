@@ -115,9 +115,11 @@ class H5Reader(object):
                         datat['Posz'] = pos[:,2]
                     else:
                         datat[attrib] = npdata
+#                datat["Aggkey"] = list(map(lambda x: hash((time,x)),datat["Label"]))
                 data[time] = pd.DataFrame.from_dict(datat)
+
                 if index is not None:
-                    data[time].set_index('Label', inplace=True)
+                    data[time].set_index(index, inplace=True)
         return data
 
 class DLCA(object):
@@ -215,8 +217,7 @@ class DLCA(object):
         
         # turn data into a large panda multiindex dataframe
         self.Aggregates = pd.concat(data, names=['Time', 'Label'])
-        
-        
+         
     #@profile
     def read_all_spheres(self, lock=None):
         """

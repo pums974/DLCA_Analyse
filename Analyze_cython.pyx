@@ -34,9 +34,9 @@ def c_cov(const double[:, :]& X):
         return 0
 
 def c_cov1(const double[:]& X,
-          const double[:]& Y,
-          const double[:]& Z,
-          const double[:]& R):
+           const double[:]& Y,
+           const double[:]& Z,
+           const double[:]& R):
   
     cdef long points = X.shape[0]
     cdef double res
@@ -58,3 +58,26 @@ def c_cov1(const double[:]& X,
         return res/n
     else:
         return 0
+
+
+def _compute_all_cov(const int[:]& Aggs,
+                     const double[:]& X,
+                     const double[:]& Y,
+                     const double[:]& Z,
+                     const double[:]& R):
+
+    cdef Py_ssize_t nsph = len(X)
+    cdef Py_ssize_t nAgg = len(Aggs)
+
+    cdef double[:] res = np.empty(len(Aggs))
+
+    cdef Py_ssize_t isph = 0
+    cdef Py_ssize_t iagg
+    for iagg in range(nAgg):
+        Np = Aggs[iagg]
+        res[iagg] = c_cov1(X[isph:isph+Np],
+                           Y[isph:isph+Np],
+                           Z[isph:isph+Np],
+                           R[isph:isph+Np])
+        isph += Np
+    return np.asarray(res)
